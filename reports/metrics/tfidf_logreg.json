@@ -1,0 +1,369 @@
+{
+  "model": "tfidf_logreg",
+  "family": "1. Base: TF-IDF + regresión logística jerárquica",
+  "dataset_hash": "f064fad0abaeb22a6222d6a6e8cc454e83ac0447e1ceeea0b1be229c7b6bbda4",
+  "train_rows": 147532,
+  "train_seconds": 321.2,
+  "temperature": 1.2731,
+  "validation": {
+    "level_5": {
+      "n": 16619,
+      "top1": {
+        "value": 0.2549,
+        "low": 0.2486,
+        "high": 0.2616
+      },
+      "top3": {
+        "value": 0.4251,
+        "low": 0.4173,
+        "high": 0.4322
+      },
+      "macro_f1": {
+        "value": 0.1907,
+        "low": 0.1828,
+        "high": 0.2073
+      },
+      "ece": 0.1428,
+      "coverage_at_target": 0.0003
+    },
+    "level_9": {
+      "n": 16619,
+      "top1": {
+        "value": 0.1624,
+        "low": 0.157,
+        "high": 0.168
+      },
+      "top3": {
+        "value": 0.2771,
+        "low": 0.27,
+        "high": 0.284
+      },
+      "macro_f1": {
+        "value": 0.126,
+        "low": 0.1251,
+        "high": 0.1399
+      },
+      "ece": 0.2105,
+      "coverage_at_target": 0.0001
+    },
+    "abstention": {
+      "threshold": 0.9997,
+      "coverage": 0.0001,
+      "answered_top1": 1.0,
+      "target": 0.9
+    },
+    "by_train_frequency": {
+      "0 (no visto)": {
+        "n": 242.0,
+        "top1": 0.0
+      },
+      "1-5": {
+        "n": 697.0,
+        "top1": 0.06599713055954089
+      },
+      "101+": {
+        "n": 12010.0,
+        "top1": 0.17160699417152372
+      },
+      "21-100": {
+        "n": 2396.0,
+        "top1": 0.1832220367278798
+      },
+      "6-20": {
+        "n": 1274.0,
+        "top1": 0.12009419152276295
+      }
+    },
+    "subsets": {
+      "texto_libre": {
+        "level_5": {
+          "n": 16109,
+          "top1": 0.2419,
+          "top3": 0.4144,
+          "macro_f1": 0.1628,
+          "ece": 0.1509,
+          "coverage_at_target": 0.0003
+        },
+        "level_9": {
+          "n": 16109,
+          "top1": 0.1616,
+          "top3": 0.278,
+          "macro_f1": 0.1193,
+          "ece": 0.2079,
+          "coverage_at_target": 0.0001
+        }
+      },
+      "proceso_multi_un_codigo": {
+        "level_5": {
+          "n": 1373,
+          "top1": 0.0757,
+          "top3": 0.1544,
+          "macro_f1": 0.1336,
+          "ece": 0.2742,
+          "coverage_at_target": 0.0
+        },
+        "level_9": {
+          "n": 1373,
+          "top1": 0.0452,
+          "top3": 0.0998,
+          "macro_f1": 0.1122,
+          "ece": 0.2852,
+          "coverage_at_target": 0.0
+        }
+      },
+      "proceso_multi_varios_codigos": {
+        "level_5": {
+          "n": 13231,
+          "top1": 0.2366,
+          "top3": 0.4206,
+          "macro_f1": 0.1566,
+          "ece": 0.1444,
+          "coverage_at_target": 0.001
+        },
+        "level_9": {
+          "n": 13231,
+          "top1": 0.1579,
+          "top3": 0.2796,
+          "macro_f1": 0.114,
+          "ece": 0.2007,
+          "coverage_at_target": 0.0
+        }
+      },
+      "proceso_unico": {
+        "level_5": {
+          "n": 2015,
+          "top1": 0.4978,
+          "top3": 0.6387,
+          "macro_f1": 0.2974,
+          "ece": 0.0855,
+          "coverage_at_target": 0.0025
+        },
+        "level_9": {
+          "n": 2015,
+          "top1": 0.272,
+          "top3": 0.3811,
+          "macro_f1": 0.1737,
+          "ece": 0.224,
+          "coverage_at_target": 0.001
+        }
+      },
+      "anio_2024": {
+        "level_5": {
+          "n": 16619,
+          "top1": 0.2549,
+          "top3": 0.4251,
+          "macro_f1": 0.1907,
+          "ece": 0.1428,
+          "coverage_at_target": 0.0003
+        },
+        "level_9": {
+          "n": 16619,
+          "top1": 0.1624,
+          "top3": 0.2771,
+          "macro_f1": 0.126,
+          "ece": 0.2105,
+          "coverage_at_target": 0.0001
+        }
+      }
+    }
+  },
+  "test": {
+    "level_5": {
+      "n": 157632,
+      "top1": {
+        "value": 0.1997,
+        "low": 0.1978,
+        "high": 0.2016
+      },
+      "top3": {
+        "value": 0.3656,
+        "low": 0.3632,
+        "high": 0.3681
+      },
+      "macro_f1": {
+        "value": 0.1135,
+        "low": 0.1076,
+        "high": 0.1198
+      },
+      "ece": 0.1634,
+      "coverage_at_target": 0.0
+    },
+    "level_9": {
+      "n": 157632,
+      "top1": {
+        "value": 0.1248,
+        "low": 0.1233,
+        "high": 0.1264
+      },
+      "top3": {
+        "value": 0.2302,
+        "low": 0.2281,
+        "high": 0.2322
+      },
+      "macro_f1": {
+        "value": 0.062,
+        "low": 0.06,
+        "high": 0.0657
+      },
+      "ece": 0.2165,
+      "coverage_at_target": 0.0
+    },
+    "abstention": {
+      "threshold": 0.9997,
+      "coverage": 0.0,
+      "answered_top1": 0.0,
+      "target": 0.9
+    },
+    "by_train_frequency": {
+      "0 (no visto)": {
+        "n": 1308.0,
+        "top1": 0.0
+      },
+      "1-5": {
+        "n": 7100.0,
+        "top1": 0.020422535211267606
+      },
+      "101+": {
+        "n": 109898.0,
+        "top1": 0.14417914793717812
+      },
+      "21-100": {
+        "n": 28004.0,
+        "top1": 0.11373375232109699
+      },
+      "6-20": {
+        "n": 11322.0,
+        "top1": 0.044338456103161984
+      }
+    },
+    "subsets": {
+      "texto_libre": {
+        "level_5": {
+          "n": 156813,
+          "top1": 0.1974,
+          "top3": 0.3636,
+          "macro_f1": 0.0875,
+          "ece": 0.1648,
+          "coverage_at_target": 0.0
+        },
+        "level_9": {
+          "n": 156813,
+          "top1": 0.1244,
+          "top3": 0.2301,
+          "macro_f1": 0.0518,
+          "ece": 0.2162,
+          "coverage_at_target": 0.0
+        }
+      },
+      "proceso_multi_un_codigo": {
+        "level_5": {
+          "n": 39843,
+          "top1": 0.0472,
+          "top3": 0.1115,
+          "macro_f1": 0.0524,
+          "ece": 0.3071,
+          "coverage_at_target": 0.0
+        },
+        "level_9": {
+          "n": 39843,
+          "top1": 0.0267,
+          "top3": 0.0545,
+          "macro_f1": 0.0342,
+          "ece": 0.307,
+          "coverage_at_target": 0.0
+        }
+      },
+      "proceso_multi_varios_codigos": {
+        "level_5": {
+          "n": 114463,
+          "top1": 0.2454,
+          "top3": 0.4472,
+          "macro_f1": 0.0863,
+          "ece": 0.1163,
+          "coverage_at_target": 0.0001
+        },
+        "level_9": {
+          "n": 114463,
+          "top1": 0.1559,
+          "top3": 0.2882,
+          "macro_f1": 0.0514,
+          "ece": 0.1842,
+          "coverage_at_target": 0.0001
+        }
+      },
+      "proceso_unico": {
+        "level_5": {
+          "n": 3326,
+          "top1": 0.4552,
+          "top3": 0.6034,
+          "macro_f1": 0.2828,
+          "ece": 0.0651,
+          "coverage_at_target": 0.0021
+        },
+        "level_9": {
+          "n": 3326,
+          "top1": 0.2309,
+          "top3": 0.3382,
+          "macro_f1": 0.1418,
+          "ece": 0.2437,
+          "coverage_at_target": 0.0
+        }
+      },
+      "anio_2025": {
+        "level_5": {
+          "n": 28771,
+          "top1": 0.2312,
+          "top3": 0.406,
+          "macro_f1": 0.155,
+          "ece": 0.1489,
+          "coverage_at_target": 0.0001
+        },
+        "level_9": {
+          "n": 28771,
+          "top1": 0.1464,
+          "top3": 0.2592,
+          "macro_f1": 0.1002,
+          "ece": 0.2095,
+          "coverage_at_target": 0.0
+        }
+      },
+      "anio_2026": {
+        "level_5": {
+          "n": 128861,
+          "top1": 0.1927,
+          "top3": 0.3566,
+          "macro_f1": 0.1016,
+          "ece": 0.1667,
+          "coverage_at_target": 0.0
+        },
+        "level_9": {
+          "n": 128861,
+          "top1": 0.12,
+          "top3": 0.2237,
+          "macro_f1": 0.0516,
+          "ece": 0.2181,
+          "coverage_at_target": 0.0
+        }
+      }
+    }
+  },
+  "latency_cpu": {
+    "p50_ms": 89.52,
+    "p95_ms": 125.41,
+    "n": 200.0
+  },
+  "size_mb": 409.13,
+  "quantization": {
+    "float32_top1_9": 0.1248,
+    "int8_top1_9": 0.1249,
+    "drop": -0.0001,
+    "float32_weights_mb": 473.86,
+    "int8_weights_mb": 133.48,
+    "int8_file_mb": 53.22,
+    "int8_latency_cpu": {
+      "p50_ms": 114.38,
+      "p95_ms": 291.83,
+      "n": 200.0
+    }
+  }
+}

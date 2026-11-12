@@ -1,0 +1,356 @@
+{
+  "model": "tfidf_knn",
+  "family": "4. Recuperación: vecinos TF-IDF + voto ponderado",
+  "dataset_hash": "f064fad0abaeb22a6222d6a6e8cc454e83ac0447e1ceeea0b1be229c7b6bbda4",
+  "train_rows": 147532,
+  "train_seconds": 31.5,
+  "temperature": 5.0,
+  "validation": {
+    "level_5": {
+      "n": 16619,
+      "top1": {
+        "value": 0.2275,
+        "low": 0.2212,
+        "high": 0.2339
+      },
+      "top3": {
+        "value": 0.4115,
+        "low": 0.4039,
+        "high": 0.4184
+      },
+      "macro_f1": {
+        "value": 0.1478,
+        "low": 0.1412,
+        "high": 0.1632
+      },
+      "ece": 0.0082,
+      "coverage_at_target": 0.0135
+    },
+    "level_9": {
+      "n": 16619,
+      "top1": {
+        "value": 0.1748,
+        "low": 0.1689,
+        "high": 0.1803
+      },
+      "top3": {
+        "value": 0.2902,
+        "low": 0.2832,
+        "high": 0.2973
+      },
+      "macro_f1": {
+        "value": 0.124,
+        "low": 0.1255,
+        "high": 0.1395
+      },
+      "ece": 0.066,
+      "coverage_at_target": 0.0007
+    },
+    "abstention": {
+      "threshold": 0.6781,
+      "coverage": 0.0007,
+      "answered_top1": 0.9167,
+      "target": 0.9
+    },
+    "by_train_frequency": {
+      "0 (no visto)": {
+        "n": 242.0,
+        "top1": 0.0
+      },
+      "1-5": {
+        "n": 697.0,
+        "top1": 0.06169296987087518
+      },
+      "101+": {
+        "n": 12010.0,
+        "top1": 0.1849292256452956
+      },
+      "21-100": {
+        "n": 2396.0,
+        "top1": 0.19156928213689484
+      },
+      "6-20": {
+        "n": 1274.0,
+        "top1": 0.14285714285714285
+      }
+    },
+    "subsets": {
+      "texto_libre": {
+        "level_5": {
+          "n": 16109,
+          "top1": 0.214,
+          "top3": 0.4,
+          "macro_f1": 0.1229,
+          "ece": 0.0068,
+          "coverage_at_target": 0.0001
+        },
+        "level_9": {
+          "n": 16109,
+          "top1": 0.1746,
+          "top3": 0.2899,
+          "macro_f1": 0.1214,
+          "ece": 0.0665,
+          "coverage_at_target": 0.0006
+        }
+      },
+      "proceso_multi_un_codigo": {
+        "level_5": {
+          "n": 1373,
+          "top1": 0.0714,
+          "top3": 0.1551,
+          "macro_f1": 0.1276,
+          "ece": 0.1275,
+          "coverage_at_target": 0.0
+        },
+        "level_9": {
+          "n": 1373,
+          "top1": 0.0524,
+          "top3": 0.102,
+          "macro_f1": 0.1148,
+          "ece": 0.0504,
+          "coverage_at_target": 0.0
+        }
+      },
+      "proceso_multi_varios_codigos": {
+        "level_5": {
+          "n": 13231,
+          "top1": 0.2089,
+          "top3": 0.403,
+          "macro_f1": 0.1183,
+          "ece": 0.007,
+          "coverage_at_target": 0.0001
+        },
+        "level_9": {
+          "n": 13231,
+          "top1": 0.1716,
+          "top3": 0.2889,
+          "macro_f1": 0.1186,
+          "ece": 0.0632,
+          "coverage_at_target": 0.0
+        }
+      },
+      "proceso_unico": {
+        "level_5": {
+          "n": 2015,
+          "top1": 0.4556,
+          "top3": 0.6417,
+          "macro_f1": 0.2385,
+          "ece": 0.1423,
+          "coverage_at_target": 0.1926
+        },
+        "level_9": {
+          "n": 2015,
+          "top1": 0.2794,
+          "top3": 0.4268,
+          "macro_f1": 0.1593,
+          "ece": 0.1609,
+          "coverage_at_target": 0.0129
+        }
+      },
+      "anio_2024": {
+        "level_5": {
+          "n": 16619,
+          "top1": 0.2275,
+          "top3": 0.4115,
+          "macro_f1": 0.1478,
+          "ece": 0.0082,
+          "coverage_at_target": 0.0135
+        },
+        "level_9": {
+          "n": 16619,
+          "top1": 0.1748,
+          "top3": 0.2902,
+          "macro_f1": 0.124,
+          "ece": 0.066,
+          "coverage_at_target": 0.0007
+        }
+      }
+    }
+  },
+  "test": {
+    "level_5": {
+      "n": 157632,
+      "top1": {
+        "value": 0.1859,
+        "low": 0.1839,
+        "high": 0.1877
+      },
+      "top3": {
+        "value": 0.3522,
+        "low": 0.3498,
+        "high": 0.3547
+      },
+      "macro_f1": {
+        "value": 0.0867,
+        "low": 0.0826,
+        "high": 0.093
+      },
+      "ece": 0.0192,
+      "coverage_at_target": 0.0001
+    },
+    "level_9": {
+      "n": 157632,
+      "top1": {
+        "value": 0.1323,
+        "low": 0.1305,
+        "high": 0.134
+      },
+      "top3": {
+        "value": 0.2364,
+        "low": 0.2343,
+        "high": 0.2385
+      },
+      "macro_f1": {
+        "value": 0.0613,
+        "low": 0.0592,
+        "high": 0.065
+      },
+      "ece": 0.0327,
+      "coverage_at_target": 0.0
+    },
+    "abstention": {
+      "threshold": 0.6781,
+      "coverage": 0.0002,
+      "answered_top1": 0.5714,
+      "target": 0.9
+    },
+    "by_train_frequency": {
+      "0 (no visto)": {
+        "n": 1308.0,
+        "top1": 0.0
+      },
+      "1-5": {
+        "n": 7100.0,
+        "top1": 0.022676056338028168
+      },
+      "101+": {
+        "n": 109898.0,
+        "top1": 0.15136763180403648
+      },
+      "21-100": {
+        "n": 28004.0,
+        "top1": 0.12376803313812312
+      },
+      "6-20": {
+        "n": 11322.0,
+        "top1": 0.05175763999293411
+      }
+    },
+    "subsets": {
+      "texto_libre": {
+        "level_5": {
+          "n": 156813,
+          "top1": 0.1834,
+          "top3": 0.35,
+          "macro_f1": 0.0678,
+          "ece": 0.0204,
+          "coverage_at_target": 0.0
+        },
+        "level_9": {
+          "n": 156813,
+          "top1": 0.132,
+          "top3": 0.2357,
+          "macro_f1": 0.0535,
+          "ece": 0.0326,
+          "coverage_at_target": 0.0
+        }
+      },
+      "proceso_multi_un_codigo": {
+        "level_5": {
+          "n": 39843,
+          "top1": 0.038,
+          "top3": 0.1009,
+          "macro_f1": 0.034,
+          "ece": 0.1595,
+          "coverage_at_target": 0.0
+        },
+        "level_9": {
+          "n": 39843,
+          "top1": 0.0248,
+          "top3": 0.0498,
+          "macro_f1": 0.0288,
+          "ece": 0.0797,
+          "coverage_at_target": 0.0
+        }
+      },
+      "proceso_multi_varios_codigos": {
+        "level_5": {
+          "n": 114463,
+          "top1": 0.2301,
+          "top3": 0.4319,
+          "macro_f1": 0.0662,
+          "ece": 0.0279,
+          "coverage_at_target": 0.0
+        },
+        "level_9": {
+          "n": 114463,
+          "top1": 0.1667,
+          "top3": 0.2964,
+          "macro_f1": 0.0528,
+          "ece": 0.0639,
+          "coverage_at_target": 0.0
+        }
+      },
+      "proceso_unico": {
+        "level_5": {
+          "n": 3326,
+          "top1": 0.4387,
+          "top3": 0.6203,
+          "macro_f1": 0.2534,
+          "ece": 0.1292,
+          "coverage_at_target": 0.1939
+        },
+        "level_9": {
+          "n": 3326,
+          "top1": 0.2354,
+          "top3": 0.4071,
+          "macro_f1": 0.1383,
+          "ece": 0.1248,
+          "coverage_at_target": 0.003
+        }
+      },
+      "anio_2025": {
+        "level_5": {
+          "n": 28771,
+          "top1": 0.2157,
+          "top3": 0.3968,
+          "macro_f1": 0.1301,
+          "ece": 0.0096,
+          "coverage_at_target": 0.0002
+        },
+        "level_9": {
+          "n": 28771,
+          "top1": 0.1555,
+          "top3": 0.2693,
+          "macro_f1": 0.098,
+          "ece": 0.0527,
+          "coverage_at_target": 0.0
+        }
+      },
+      "anio_2026": {
+        "level_5": {
+          "n": 128861,
+          "top1": 0.1793,
+          "top3": 0.3423,
+          "macro_f1": 0.074,
+          "ece": 0.0234,
+          "coverage_at_target": 0.0001
+        },
+        "level_9": {
+          "n": 128861,
+          "top1": 0.1271,
+          "top3": 0.229,
+          "macro_f1": 0.0534,
+          "ece": 0.0283,
+          "coverage_at_target": 0.0
+        }
+      }
+    }
+  },
+  "latency_cpu": {
+    "p50_ms": 6.42,
+    "p95_ms": 11.46,
+    "n": 200.0
+  },
+  "size_mb": 60.45
+}
