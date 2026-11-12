@@ -36,7 +36,9 @@ INTERIM_SCHEMA: dict[str, Any] = {
 }
 
 
-def item_row(it: RawItem, norm: TextNormalizer, pii: PiiDetector, cfg: DataConfig) -> dict[str, Any]:
+def item_row(
+    it: RawItem, norm: TextNormalizer, pii: PiiDetector, cfg: DataConfig
+) -> dict[str, Any]:
     desc_norm = norm.normalize(it.description)
     label_norm = norm.normalize(it.cpc_label)
     code = clean_code(it.cpc_raw, it.additional_code, cfg.codes)
@@ -96,11 +98,14 @@ def _ingest_year(args: tuple[int, str, str, DataConfig]) -> tuple[int, int]:
     return year, ingest_file(src, dst, cfg)
 
 
-def ingest_years(cfg: DataConfig, years: list[int] | None = None, workers: int = 4,
-                 raw_dir: str | None = None) -> dict[int, int]:
+def ingest_years(
+    cfg: DataConfig, years: list[int] | None = None, workers: int = 4, raw_dir: str | None = None
+) -> dict[int, int]:
     todo = years or cfg.source.years
     raw = raw_dir or cfg.source.raw_dir
-    jobs = [(y, raw, cfg.paths.interim_dir, cfg) for y in todo if (Path(raw) / f"{y}.jsonl.gz").exists()]
+    jobs = [
+        (y, raw, cfg.paths.interim_dir, cfg) for y in todo if (Path(raw) / f"{y}.jsonl.gz").exists()
+    ]
     if workers <= 1:
         return dict(_ingest_year(j) for j in jobs)
     with ProcessPoolExecutor(workers) as pool:

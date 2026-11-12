@@ -69,6 +69,12 @@ class CodeOut(BaseModel):
     n_items: int
 
 
+class SubsetOut(BaseModel):
+    n: int
+    top1: float
+    top3: float
+
+
 class ModelInfoOut(BaseModel):
     name: str
     family: str
@@ -77,6 +83,10 @@ class ModelInfoOut(BaseModel):
     threshold: float
     target_precision: float
     metrics: dict[str, float]
+    intervals: dict[str, tuple[float, float]]
+    subsets: dict[str, SubsetOut]
+    latency_ms_p50: float | None
+    size_mb: float | None
     data_attribution: str
     data_license: str
     data_license_url: str

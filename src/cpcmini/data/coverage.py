@@ -61,8 +61,9 @@ def long_tail(train: pl.DataFrame) -> dict[str, int]:
     return out
 
 
-def coverage_report(interim_dir: str | Path, years: list[int],
-                    train: pl.DataFrame | None = None) -> dict[str, Any]:
+def coverage_report(
+    interim_dir: str | Path, years: list[int], train: pl.DataFrame | None = None
+) -> dict[str, Any]:
     files = [Path(interim_dir) / f"items_{y}.parquet" for y in years]
     items = pl.read_parquet([f for f in files if f.exists()])
     report: dict[str, Any] = {

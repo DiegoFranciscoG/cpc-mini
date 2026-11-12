@@ -42,7 +42,11 @@ def download_year(cfg: SourceConfig, year: int, dest_dir: Path, force: bool = Fa
 
 
 def write_checksums(dest_dir: Path, years: list[int]) -> Path:
-    sums = {str(y): sha256_of(dest_dir / f"{y}.jsonl.gz") for y in years if (dest_dir / f"{y}.jsonl.gz").exists()}
+    sums = {
+        str(y): sha256_of(dest_dir / f"{y}.jsonl.gz")
+        for y in years
+        if (dest_dir / f"{y}.jsonl.gz").exists()
+    }
     out = dest_dir / "SHA256SUMS.json"
     out.write_text(json.dumps(sums, indent=2), encoding="utf-8")
     return out

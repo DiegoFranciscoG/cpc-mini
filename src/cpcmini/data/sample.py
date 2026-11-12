@@ -24,12 +24,17 @@ def _min_item(it: dict[str, Any]) -> dict[str, Any]:
     out: dict[str, Any] = {
         "id": it.get("id"),
         "description": it.get("description"),
-        "classification": {"id": cls.get("id"), "scheme": cls.get("scheme"),
-                           "description": cls.get("description")},
+        "classification": {
+            "id": cls.get("id"),
+            "scheme": cls.get("scheme"),
+            "description": cls.get("description"),
+        },
     }
     extra = it.get("additionalClassifications") or []
     if extra:
-        out["additionalClassifications"] = [{"id": extra[0].get("id"), "scheme": extra[0].get("scheme")}]
+        out["additionalClassifications"] = [
+            {"id": extra[0].get("id"), "scheme": extra[0].get("scheme")}
+        ]
     return out
 
 
@@ -43,8 +48,10 @@ def minimize_record(record: dict[str, Any]) -> dict[str, Any]:
             "mainProcurementCategory": tender.get("mainProcurementCategory"),
             "items": [_min_item(i) for i in (tender.get("items") or [])[:MAX_ITEMS_PER_RECORD]],
         },
-        "awards": [{"items": [_min_item(i) for i in (a.get("items") or [])[:MAX_ITEMS_PER_RECORD]]}
-                   for a in (record.get("awards") or [])],
+        "awards": [
+            {"items": [_min_item(i) for i in (a.get("items") or [])[:MAX_ITEMS_PER_RECORD]]}
+            for a in (record.get("awards") or [])
+        ],
     }
 
 
@@ -53,8 +60,9 @@ def keep(ocid: str, rate: int, seed: int) -> bool:
     return int.from_bytes(digest[:4], "big") % rate == 0
 
 
-def build_sample(cfg: DataConfig, out_dir: str | Path, rate: int, seed: int,
-                 raw_dir: str | None = None) -> dict[int, int]:
+def build_sample(
+    cfg: DataConfig, out_dir: str | Path, rate: int, seed: int, raw_dir: str | None = None
+) -> dict[int, int]:
     """Toma ~1 de cada ``rate`` procesos por año (selección determinista por hash del ocid)."""
     pii = PiiDetector(cfg.pii)
     out = Path(out_dir)

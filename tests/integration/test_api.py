@@ -75,14 +75,17 @@ def _client(settings, db_url, rate=100, threshold=0.0):
         size_bytes=1,
         seed=1,
         metrics={
+            "latency_cpu": {"p50_ms": 4.2},
+            "size_mb": 12.5,
             "test": {
+                "subsets": {"proceso_unico": {"level_9": {"n": 10, "top1": 0.4, "top3": 0.6}}},
                 "level_9": {
                     "top1": {"value": 0.5},
                     "top3": {"value": 0.7},
                     "macro_f1": {"value": 0.3},
                 },
                 "abstention": {"coverage": 0.4, "answered_top1": 0.9},
-            }
+            },
         },
     )
     state = AppState(
@@ -105,6 +108,10 @@ def test_health_model_and_prediction(settings, db_url):
         info = client.get("/api/v1/model").json()
         assert "SERCOP" in info["data_attribution"] and info["data_license"] == "CC BY 3.0 EC"
         assert info["metrics"]["level_9_top1"] == 0.5
+        assert info["intervals"] == {}
+        assert info["subsets"]["proceso_unico"] == {"n": 10, "top1": 0.4, "top3": 0.6}
+        assert info["latency_ms_p50"] == 4.2
+        assert info["size_mb"] == 12.5
         res = client.post("/api/v1/predictions", json={"description": "  Paracetamol 500MG tab  "})
         assert res.status_code == 200
         body = res.json()

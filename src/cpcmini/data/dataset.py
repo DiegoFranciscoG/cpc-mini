@@ -19,8 +19,20 @@ from cpcmini.config import DataConfig
 
 SPLITS = ("train", "val", "test")
 OUTPUT_COLUMNS = [
-    "desc_norm", "description", "signature", "code9", "code5", "code", "n_items",
-    "code_agreement", "label_copy", "category", "method", "process_kind", "year_min", "year_max",
+    "desc_norm",
+    "description",
+    "signature",
+    "code9",
+    "code5",
+    "code",
+    "n_items",
+    "code_agreement",
+    "label_copy",
+    "category",
+    "method",
+    "process_kind",
+    "year_min",
+    "year_max",
     "split",
 ]
 
@@ -99,11 +111,17 @@ def with_process_kind(items: pl.DataFrame) -> pl.DataFrame:
     """Tipo de proceso del ítem: único, multi-ítem con un solo código (código del proceso) o mixto."""
     code9 = pl.col("code").str.slice(0, 9)
     proc = items.group_by("ocid").agg(proc_items=pl.len(), proc_codes=code9.n_unique())
-    return items.join(proc, on="ocid", how="left").with_columns(
-        process_kind=pl.when(pl.col("proc_items") == 1).then(pl.lit("unico"))
-        .when(pl.col("proc_codes") == 1).then(pl.lit("multi_un_codigo"))
-        .otherwise(pl.lit("multi_varios_codigos"))
-    ).drop("proc_items", "proc_codes")
+    return (
+        items.join(proc, on="ocid", how="left")
+        .with_columns(
+            process_kind=pl.when(pl.col("proc_items") == 1)
+            .then(pl.lit("unico"))
+            .when(pl.col("proc_codes") == 1)
+            .then(pl.lit("multi_un_codigo"))
+            .otherwise(pl.lit("multi_varios_codigos"))
+        )
+        .drop("proc_items", "proc_codes")
+    )
 
 
 def aggregate_split(items: pl.DataFrame) -> pl.DataFrame:
@@ -171,7 +189,9 @@ def config_hash(cfg: DataConfig) -> str:
 
 def build_catalog(kept: pl.DataFrame) -> pl.DataFrame:
     """Catálogo de códigos de 9 dígitos con su etiqueta oficial más frecuente en los datos."""
-    items = kept.with_columns(code9=pl.col("code").str.slice(0, 9), exact=pl.col("code").str.len_chars() == 9)
+    items = kept.with_columns(
+        code9=pl.col("code").str.slice(0, 9), exact=pl.col("code").str.len_chars() == 9
+    )
     labels = (
         items.filter(pl.col("cpc_label") != "")
         .group_by(["code9", "cpc_label"])
@@ -191,8 +211,9 @@ def build_catalog(kept: pl.DataFrame) -> pl.DataFrame:
     )
 
 
-def build_dataset(cfg: DataConfig, interim_dir: str | Path | None = None,
-                  out_dir: str | Path | None = None) -> Manifest:
+def build_dataset(
+    cfg: DataConfig, interim_dir: str | Path | None = None, out_dir: str | Path | None = None
+) -> Manifest:
     interim = interim_dir or cfg.paths.interim_dir
     out = Path(out_dir or cfg.paths.processed_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -201,7 +222,8 @@ def build_dataset(cfg: DataConfig, interim_dir: str | Path | None = None,
     pii_types = (
         items.filter(pl.col("code").is_not_null() & pl.col("informative") & (pl.col("pii") != ""))
         .select(pl.col("pii").str.split(",").explode())
-        .group_by("pii").len()
+        .group_by("pii")
+        .len()
     )
     kept = with_process_kind(items.filter(keep_mask())).with_columns(
         split=pl.col("year").map_elements(cfg.split.split_of, return_dtype=pl.String)
@@ -215,17 +237,26 @@ def build_dataset(cfg: DataConfig, interim_dir: str | Path | None = None,
         part = kept.filter(pl.col("split") == name)
         agg = aggregate_split(part)
         unique = agg.height
-        agg, n_exact, n_sig = remove_leakage(agg, seen_desc, seen_sig, cfg.dedup.use_token_signature)
+        agg, n_exact, n_sig = remove_leakage(
+            agg, seen_desc, seen_sig, cfg.dedup.use_token_signature
+        )
         agg = agg.with_columns(split=pl.lit(name)).select(OUTPUT_COLUMNS)
         frames[name] = agg
         seen_desc.update(agg["desc_norm"].to_list())
         seen_sig.update(agg["signature"].to_list())
-        counts.append(SplitCounts(
-            split=name, items=part.height, unique_descriptions=unique,
-            removed_leakage_exact=n_exact, removed_leakage_signature=n_sig, rows=agg.height,
-            codes9=agg["code9"].n_unique(), codes5=agg["code5"].n_unique(),
-            label_copy_rows=int(agg["label_copy"].sum()),
-        ))
+        counts.append(
+            SplitCounts(
+                split=name,
+                items=part.height,
+                unique_descriptions=unique,
+                removed_leakage_exact=n_exact,
+                removed_leakage_signature=n_sig,
+                rows=agg.height,
+                codes9=agg["code9"].n_unique(),
+                codes5=agg["code5"].n_unique(),
+                label_copy_rows=int(agg["label_copy"].sum()),
+            )
+        )
         agg.write_parquet(out / f"{name}.parquet", compression="zstd")
     build_catalog(kept).write_parquet(out / "catalog.parquet", compression="zstd")
     manifest = Manifest(

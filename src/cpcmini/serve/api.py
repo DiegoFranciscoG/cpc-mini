@@ -26,6 +26,7 @@ from cpcmini.serve.schemas import (
     ModelInfoOut,
     PredictionOut,
     PredictionRequest,
+    SubsetOut,
 )
 from cpcmini.serve.security import (
     BodySizeMiddleware,
@@ -145,11 +146,24 @@ def create_app(api: ApiSettings | None = None, state: AppState | None = None) ->
         meta, src = st.predictor.meta, st.settings.data.source
         test = meta.metrics.get("test", {})
         flat: dict[str, float] = {}
+        intervals: dict[str, tuple[float, float]] = {}
         for level in ("level_5", "level_9"):
             for key in ("top1", "top3", "macro_f1"):
                 value = test.get(level, {}).get(key)
                 if isinstance(value, dict):
                     flat[f"{level}_{key}"] = float(value["value"])
+                    if "low" in value and "high" in value:
+                        intervals[f"{level}_{key}"] = (float(value["low"]), float(value["high"]))
+        subsets = {
+            name: SubsetOut(
+                n=int(block["level_9"]["n"]),
+                top1=float(block["level_9"]["top1"]),
+                top3=float(block["level_9"]["top3"]),
+            )
+            for name, block in test.get("subsets", {}).items()
+        }
+        latency = meta.metrics.get("latency_cpu", {}).get("p50_ms")
+        size = meta.metrics.get("size_mb")
         abst = test.get("abstention", {})
         if abst:
             flat["coverage_at_threshold"] = float(abst.get("coverage", 0.0))
@@ -162,6 +176,10 @@ def create_app(api: ApiSettings | None = None, state: AppState | None = None) ->
             threshold=meta.threshold,
             target_precision=st.settings.eval.target_precision,
             metrics=flat,
+            intervals=intervals,
+            subsets=subsets,
+            latency_ms_p50=float(latency) if latency is not None else None,
+            size_mb=float(size) if size is not None else None,
             data_attribution=src.attribution,
             data_license=src.license,
             data_license_url=src.license_url,

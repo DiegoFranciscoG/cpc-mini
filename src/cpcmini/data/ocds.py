@@ -47,8 +47,9 @@ def _method_family(details: str | None) -> str:
     return family[:METHOD_MAX_CHARS]
 
 
-def _to_item(record: dict[str, Any], source: str, group: int, idx: int, it: dict[str, Any],
-             year: int) -> RawItem:
+def _to_item(
+    record: dict[str, Any], source: str, group: int, idx: int, it: dict[str, Any], year: int
+) -> RawItem:
     cls = it.get("classification") or {}
     additional = it.get("additionalClassifications") or []
     tender = record.get("tender") or {}
