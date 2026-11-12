@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es-EC">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CPC-mini: sugiere el código CPC de una compra pública</title>
+    <meta
+      name="description"
+      content="Escribe la descripción de un ítem de compra pública de Ecuador y recibe los tres códigos CPC más probables, con su confianza. Si duda, responde «no sé». Modelo abierto entrenado con datos del SERCOP."
+    />
+    <meta name="theme-color" content="#f5f1ea" />
+    <meta name="color-scheme" content="light" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Diego Francisco Granda Zhingre" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_EC" />
+    <meta property="og:site_name" content="CPC-mini" />
+    <meta property="og:title" content="CPC-mini: del texto de compra al código CPC" />
+    <meta
+      property="og:description"
+      content="Tres sugerencias de código CPC con su confianza, o «no sé». Datos abiertos del SERCOP, modelo que corre en una laptop."
+    />
+    <meta property="og:image" content="/og.png" />
+    <meta property="og:image:alt" content="Logotipo de CPC-mini y una ficha con un código CPC desglosado en grupo, subclase y código" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "CPC-mini",
+        "description": "Clasificador abierto que sugiere códigos del Clasificador Central de Productos (CPC) para descripciones de compras públicas de Ecuador.",
+        "inLanguage": "es-EC",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web",
+        "isAccessibleForFree": true,
+        "license": "https://opensource.org/licenses/MIT",
+        "author": {"@type": "Person", "name": "Diego Francisco Granda Zhingre"},
+        "isBasedOn": {
+          "@type": "Dataset",
+          "name": "Datos OCDS del SERCOP (OCP Data Registry, publicación 110)",
+          "license": "https://creativecommons.org/licenses/by/3.0/ec/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <div class="noscript">
+        <h1>CPC-mini necesita JavaScript</h1>
+        <p>
+          Esta herramienta consulta el modelo desde tu navegador. Activa JavaScript para escribir una descripción y
+          ver los códigos sugeridos. No usamos cookies ni rastreadores.
+        </p>
+      </div>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
