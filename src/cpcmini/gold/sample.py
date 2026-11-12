@@ -9,7 +9,8 @@ from pathlib import Path
 
 import polars as pl
 
-from cpcmini.eval.metrics import bucket_of
+from cpcmini.eval.metrics import bucket_of, hits_at_k, level_view
+from cpcmini.models.base import CandidateSet
 
 GOLD_COLUMNS = ["desc_norm", "description", "original_code9", "stratum"]
 REVIEWED_COLUMNS = [*GOLD_COLUMNS, "status", "gold_code9", "notes"]
@@ -94,3 +95,20 @@ def read_reviewed(path: str | Path) -> list[dict[str, str]]:
         return []
     with p.open(encoding="utf-8", newline="") as fh:
         return [r for r in csv.DictReader(fh) if r.get("status") in ("confirmed", "corrected")]
+
+
+def gold_metrics(cands: CandidateSet, rows: Sequence[dict[str, str]]) -> dict[str, float]:
+    """Exactitud top-1 y top-3 a 5 y 9 dígitos contra el código revisado a mano."""
+    truth = [r["gold_code9"] for r in rows]
+    out: dict[str, float] = {"n": float(len(rows))}
+    if not rows:
+        return out
+    for level in (5, 9):
+        ranked, _ = level_view(cands, level)
+        for k in (1, 3):
+            out[f"level_{level}_top{k}"] = round(
+                float(hits_at_k(ranked, truth, level, k).mean()), 4
+            )
+    agree = sum(r["gold_code9"] == r["original_code9"] for r in rows) / len(rows)
+    out["original_label_correct"] = round(agree, 4)
+    return out

@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+import numpy as np
 import polars as pl
 import pytest
 from pydantic import ValidationError
@@ -9,11 +10,13 @@ from pydantic import ValidationError
 from cpcmini.config import load_settings
 from cpcmini.gold.sample import (
     decide,
+    gold_metrics,
     read_reviewed,
     stratified_sample,
     stratum_of,
     write_candidates,
 )
+from cpcmini.models.base import CandidateSet
 from cpcmini.serve.security import TokenBucket
 from cpcmini.serve.settings import ApiSettings
 
@@ -116,3 +119,19 @@ def test_settings_override(tmp_path: Path):
     bad.write_text("- lista\n", encoding="utf-8")
     with pytest.raises(ValueError, match="mapa YAML"):
         load_settings(root, bad)
+
+
+def test_gold_metrics():
+    cands = CandidateSet(
+        [["111110001", "222220001"], ["333330001"]],
+        [np.array([0.6, 0.3]), np.array([0.9])],
+    )
+    rows = [
+        {"gold_code9": "222220001", "original_code9": "111110001"},
+        {"gold_code9": "333330001", "original_code9": "333330001"},
+    ]
+    out = gold_metrics(cands, rows)
+    assert out["level_9_top1"] == 0.5
+    assert out["level_9_top3"] == 1.0
+    assert out["original_label_correct"] == 0.5
+    assert gold_metrics(cands, []) == {"n": 0.0}

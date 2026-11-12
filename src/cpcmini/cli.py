@@ -368,6 +368,34 @@ def gold_review(
     typer.echo(f"Conjunto de oro exportado a {out}")
 
 
+@gold_app.command("evaluate")
+def gold_evaluate(
+    gold: Path = Path("gold/gold_set.csv"),
+    model_dir: Path = Path("artifacts/serving"),
+    config: ConfigOpt = Path("configs"),
+    override: OverrideOpt = None,
+    out: Path = Path("reports/metrics_gold.json"),
+) -> None:
+    """Mide el modelo contra el conjunto de oro revisado (sólo ítems confirmados o corregidos)."""
+    from cpcmini.gold.sample import gold_metrics, read_reviewed
+    from cpcmini.models.calibration import calibrate
+    from cpcmini.models.registry import load_meta, load_model
+
+    rows = read_reviewed(gold)
+    if not rows:
+        typer.echo("Aún no hay ítems revisados en el conjunto de oro (ver docs/etiquetado.md)")
+        raise typer.Exit(0)
+    meta = load_meta(model_dir)
+    cands = calibrate(
+        load_model(model_dir).predict_candidates([r["desc_norm"] for r in rows], 20),
+        meta.temperature,
+    )
+    result = {"model": meta.name, **gold_metrics(cands, rows)}
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    typer.echo(json.dumps(result, ensure_ascii=False))
+
+
 @app.command()
 def serve(host: str = "127.0.0.1", port: int = 8000) -> None:
     """Levanta la API (requiere CPCMINI_DATABASE_URL, CPCMINI_MODEL_DIR y CPCMINI_CORS_ALLOWED_ORIGINS)."""
