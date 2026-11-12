@@ -1,0 +1,68 @@
+# Hiperparámetros de la escalera de modelos. Semilla fija para reproducibilidad (T-06).
+seed: 20261112
+top_k: 3
+artifacts_dir: "artifacts"
+
+# Escalón 1 — TF-IDF (n-gramas de caracteres + palabras) + modelo lineal jerárquico.
+# loss: "log_loss" (regresión logística) o "hinge" (SVM lineal). Niveles: grupo (3 dígitos) →
+# subclase CPC (5) → código SERCOP (9). Búsqueda en haz para no arrastrar errores tempranos.
+linear:
+  loss: "log_loss"
+  # SVM lineal (liblinear): inverso de la regularización.
+  C: 1.0
+  # Regresión logística (SGD): regularización L2 por muestra; hilos para el esquema uno-contra-resto.
+  alpha: 0.000002
+  n_jobs: 4
+  max_iter: 30
+  svm_max_iter: 1000
+  tol: 0.0001
+  char_ngram_range: [2, 5]
+  word_ngram_range: [1, 2]
+  max_features_char: 100000
+  max_features_word: 50000
+  min_df: 2
+  # Un nodo sólo usa columnas que aparecen en al menos este número de documentos de su rama.
+  local_min_df: 1
+  # Tope de ejemplos por código de 9 dígitos (equilibra los códigos del catálogo electrónico).
+  max_per_class: 400
+  hierarchy_levels: [3, 5, 9]
+  beam_width: 5
+  # Escala de los márgenes del SVM antes del softmax local (luego se calibra con temperatura).
+  svm_softmax_scale: 4.0
+
+# Escalón 4 — recuperación: vecinos más cercanos (coseno sobre TF-IDF) con voto ponderado.
+# max_df descarta n-gramas presentes en casi todos los documentos (no discriminan y vuelven densa
+# la búsqueda).
+retrieval:
+  k: 25
+  power: 3.0
+  min_similarity: 0.05
+  batch_size: 1024
+  char_ngram_range: [3, 5]
+  word_ngram_range: [1, 2]
+  max_features_char: 150000
+  max_features_word: 80000
+  min_df: 2
+  max_df: 0.05
+
+# Escalón 2 — codificador multilingüe (se entrena en Kaggle, GPU T4/P100).
+encoder:
+  base_model: "jhu-clsp/mmBERT-small"
+  max_length: 64
+  epochs: 2
+  learning_rate: 0.00005
+  batch_size: 64
+  weight_decay: 0.01
+  warmup_ratio: 0.06
+
+# Escalón 3 — generativo pequeño con LoRA (Unsloth en Kaggle) y salida restringida al catálogo.
+generative:
+  base_model: "Qwen/Qwen3-0.6B-Base"
+  lora_r: 16
+  lora_alpha: 32
+  lora_dropout: 0.0
+  max_seq_length: 128
+  epochs: 1
+  learning_rate: 0.0002
+  batch_size: 32
+  prompt_template: "Descripción de compra pública: {description}\nCódigo CPC:"

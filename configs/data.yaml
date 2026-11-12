@@ -1,0 +1,116 @@
+# Configuración del flujo de datos. Todo umbral, patrón o regla vive aquí (nada quemado en código).
+# Fuente de cada regla: docs/investigacion.md (número entre corchetes).
+
+source:
+  # [1] OCP Data Registry, publicación 110 (SERCOP). Licencia CC BY 3.0 EC [2].
+  url_template: "https://data.open-contracting.org/en/publication/110/download?name={year}.jsonl.gz"
+  publication: 110
+  license: "CC BY 3.0 EC"
+  license_url: "https://creativecommons.org/licenses/by/3.0/ec/"
+  attribution: >-
+    Datos: Servicio Nacional de Contratación Pública (SERCOP), publicados en formato OCDS por el
+    OCP Data Registry de Open Contracting Partnership. Licencia CC BY 3.0 Ecuador. Transformados
+    (normalizados, filtrados, deduplicados y divididos por tiempo) por CPC-mini.
+  years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
+  raw_dir: "data/raw"
+
+items:
+  # Los ítems de adjudicación (awards/items) traen descripción y CPC en ~100 % de los casos (medido
+  # en docs/verificacion.md). Si un proceso no tiene ítems adjudicados, se usan los de la licitación.
+  primary_source: "award"
+  fallback_source: "tender"
+  classification_scheme: "CPC"
+
+codes:
+  # [3] SERCOP: el proveedor se registra a 5 dígitos y queda habilitado en los códigos de nivel 9
+  # contenidos en él. Los niveles se toman como prefijos de dígitos.
+  levels: [5, 9]
+  min_digits: 9
+  max_digits: 13
+  # classification.id pierde el cero inicial de la sección 0 del CPC a cualquier longitud
+  # (134929123 frente a 01349.29.1). Se restaura usando additionalClassifications (verificado en
+  # docs/verificacion.md). Códigos de menos de 9 dígitos tras la restauración se excluyen.
+  restore_leading_zero: true
+
+text:
+  min_chars: 4
+  min_alpha_tokens: 1
+  max_chars: 300
+  # Descripciones sin información de producto (remiten a pliegos, anexos, resoluciones).
+  # Se aplican sobre el texto ya normalizado (minúsculas, sin tildes).
+  generic_patterns:
+    - "^(ver|revisar|consultar|segun|conforme|de acuerdo)\\b.*\\b(pliego|especificacion|termino|anexo|proceso|solicitado|adjunto|referencia)"
+    - "^(anexo|adjunto|resolucion|oficio|memorando|contrato|orden de compra|proceso)\\b( (nro|no|n|numero))?( [a-z0-9-]+)*$"
+    - "^(segun|de acuerdo a|conforme a|ver) (lo )?(solicitado|requerido|detallado|indicado)"
+    - "^(varios|varias|otros|otras|items? varios|item|items|servicio|servicios|bienes|bien|producto|productos|obra|obras)$"
+  # Unidades: se separan del número y se unifican. Se aplican sobre texto normalizado.
+  units:
+    mg: ["mg", "mgs", "miligramo", "miligramos"]
+    g: ["g", "gr", "grs", "gramo", "gramos"]
+    kg: ["kg", "kgs", "kilo", "kilos", "kilogramo", "kilogramos"]
+    ml: ["ml", "mls", "cc", "mililitro", "mililitros"]
+    l: ["l", "lt", "lts", "litro", "litros"]
+    mm: ["mm", "milimetro", "milimetros"]
+    cm: ["cm", "cms", "centimetro", "centimetros"]
+    m: ["mt", "mts", "metro", "metros"]
+    pulgada: ["pulg", "pulgada", "pulgadas"]
+    gb: ["gb", "gigas"]
+    tb: ["tb"]
+  # Abreviaturas frecuentes en los datos (token completo → forma canónica).
+  abbreviations:
+    tab: "tableta"
+    tabs: "tableta"
+    tabletas: "tableta"
+    comp: "comprimido"
+    comprimidos: "comprimido"
+    cap: "capsula"
+    caps: "capsula"
+    capsulas: "capsula"
+    amp: "ampolla"
+    ampollas: "ampolla"
+    fco: "frasco"
+    und: "unidad"
+    unid: "unidad"
+    uds: "unidad"
+    unidades: "unidad"
+    serv: "servicio"
+    adq: "adquisicion"
+    mant: "mantenimiento"
+    mtto: "mantenimiento"
+    const: "construccion"
+    acetaminofen: "paracetamol"
+  # Frases que sólo agregan ruido al inicio de la descripción.
+  strip_prefixes:
+    - "adquisicion de"
+    - "contratacion del servicio de"
+    - "contratacion de"
+    - "servicio de"
+
+pii:
+  # Se excluye del dataset cualquier ítem cuya descripción contenga alguno de estos patrones.
+  # Cédula: 10 dígitos con provincia 01-24 o 30, tercer dígito < 6 y dígito verificador módulo 10 [4].
+  # RUC de persona natural: cédula válida + "001" [4].
+  cedula_provinces_max: 24
+  cedula_extra_provinces: [30]
+  email_regex: "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
+  # Celular 09XXXXXXXX y fijos 0[2-7] XXX XXXX, con o sin +593 y separadores.
+  phone_regexes:
+    - "(?<!\\d)(?:\\+?593[\\s-]?|0)9\\d(?:[\\s-]?\\d){7}(?!\\d)"
+    - "(?<!\\d)(?:\\+?593[\\s-]?|0)[2-7][\\s-]?\\d{3}[\\s-]?\\d{4}(?!\\d)"
+    - "(?i)\\b(telf?|tel[eé]fono|celular|cel|whatsapp)\\.?\\s*:?\\s*\\+?\\d"
+
+split:
+  # [docs/investigacion.md] División por tiempo: entrenamiento ≤ 2023, validación 2024, prueba 2025+.
+  train_max_year: 2023
+  val_years: [2024]
+  test_years: [2025, 2026]
+
+dedup:
+  # Clave exacta: texto normalizado. Clave casi-idéntica: tokens únicos ordenados.
+  # Un texto (o su firma) visto en una división anterior no puede aparecer en una posterior.
+  use_token_signature: true
+
+paths:
+  interim_dir: "data/interim"
+  processed_dir: "data/processed"
+  manifest: "data/processed/manifest.json"

@@ -1,0 +1,19 @@
+# Protocolo de evaluación común a los cuatro escalones.
+# Cobertura a confianza fija: % de ítems que el modelo responde exigiendo esta exactitud.
+target_precision: 0.90
+bootstrap_samples: 1000
+# El F1 macro es más costoso de recalcular; se usan menos remuestreos.
+bootstrap_samples_f1: 200
+bootstrap_alpha: 0.05
+ece_bins: 15
+# Límites superiores de los grupos de frecuencia de clase en entrenamiento: [1-5], [6-20], [21-100], [101+].
+frequency_buckets: [5, 20, 100]
+# T-07: el modelo cuantizado no puede perder más de 2 puntos de exactitud top-1.
+quantization_max_drop: 0.02
+# T-10: presupuesto de latencia por ítem en CPU.
+latency_budget_ms: 200
+# T-06: tolerancia al repetir el entrenamiento con la misma semilla.
+reproducibility_tolerance: 0.001
+abstain_label: "no sé"
+# Ítems de prueba usados para medir latencia ítem por ítem.
+latency_samples: 200

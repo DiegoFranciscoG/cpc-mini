@@ -1,0 +1,105 @@
+[project]
+name = "cpcmini"
+version = "0.1.0"
+description = "Clasificador de descripciones de compras públicas de Ecuador en códigos CPC, entrenado con datos abiertos del SERCOP (OCDS)."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Diego Francisco Granda Zhingre" }]
+requires-python = ">=3.12"
+dependencies = [
+    "alembic==1.20.1",
+    "fastapi==0.162.5",
+    "joblib==1.6.0",
+    "numpy==2.5.4",
+    "polars==2.1.0",
+    "pydantic==2.14.3",
+    "pydantic-settings==2.16.2",
+    "pyyaml==6.0.3",
+    "scikit-learn==1.9.1",
+    "scipy==1.18.1",
+    "sqlalchemy==2.1.8",
+    "typer==0.29.1",
+    "uvicorn==0.54.0",
+]
+
+[project.optional-dependencies]
+# Registro de experimentos local (opcional en la laptop, no se instala en la imagen de la API).
+tracking = ["mlflow-skinny==3.18.0"]
+# Escalones 2 y 3: se instalan en Kaggle (GPU). No hacen falta para la API ni para la línea base.
+gpu = [
+    "datasets==5.2.0",
+    "peft==0.21.2",
+    "sentence-transformers==6.3.0",
+    "torch==2.15.0",
+    "transformers==5.22.2",
+]
+
+[project.scripts]
+cpcmini = "cpcmini.cli:app"
+
+[dependency-groups]
+dev = [
+    "httpx2==2.16.0",
+    "mypy==2.4.1",
+    "pytest==9.2.0",
+    "pytest-cov==7.1.0",
+    "ruff==0.17.5",
+    "types-PyYAML==6.0.12.20261111",
+]
+
+[build-system]
+requires = ["hatchling==1.33.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cpcmini"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM", "RUF", "N", "C4", "PT"]
+# E501: el formateador de ruff ya ajusta el código; quedan sólo textos largos en español.
+ignore = ["S101", "E501", "RUF001", "RUF002", "RUF003"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S", "N802", "N806", "PT018"]
+"migrations/**" = ["N999", "I001"]
+
+[tool.mypy]
+python_version = "3.12"
+packages = ["cpcmini"]
+mypy_path = "src"
+strict = true
+ignore_missing_imports = true
+warn_unused_ignores = false
+
+[[tool.mypy.overrides]]
+module = ["cpcmini.models.encoder", "cpcmini.models.generative_hf"]
+disallow_untyped_calls = false
+disallow_any_generics = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "slow: pruebas que entrenan modelos sobre la muestra (segundos, no minutos)",
+    "fulldata: requieren data/ con los datos completos descargados (no corren en CI)",
+]
+
+[tool.coverage.run]
+source = ["cpcmini"]
+branch = true
+omit = [
+    "src/cpcmini/models/encoder.py",
+    "src/cpcmini/models/generative_hf.py",
+    "src/cpcmini/cli.py",
+]
+
+[tool.coverage.report]
+fail_under = 70
+show_missing = true
+skip_covered = true
