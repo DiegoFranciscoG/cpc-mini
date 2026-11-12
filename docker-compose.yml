@@ -1,0 +1,40 @@
+# docker compose up --build  →  http://localhost:8080 (frontend + API con el modelo de demostración)
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cpc-mini-api:0.1.0
+    environment:
+      CPCMINI_DATABASE_URL: ${CPCMINI_DATABASE_URL:?Define CPCMINI_DATABASE_URL en .env}
+      CPCMINI_MODEL_DIR: ${CPCMINI_MODEL_DIR:?Define CPCMINI_MODEL_DIR en .env}
+      CPCMINI_CORS_ALLOWED_ORIGINS: ${CPCMINI_CORS_ALLOWED_ORIGINS:?Define CPCMINI_CORS_ALLOWED_ORIGINS en .env}
+      CPCMINI_RATE_LIMIT_PER_MINUTE: ${CPCMINI_RATE_LIMIT_PER_MINUTE:-60}
+      CPCMINI_DOCS_ENABLED: ${CPCMINI_DOCS_ENABLED:-true}
+      CPCMINI_TRUST_PROXY_HEADERS: ${CPCMINI_TRUST_PROXY_HEADERS:-true}
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    expose:
+      - "8000"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend
+    image: cpc-mini-web:0.1.0
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${WEB_PORT:-8080}:8080"
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    restart: unless-stopped
