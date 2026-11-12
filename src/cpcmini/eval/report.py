@@ -58,7 +58,9 @@ def render(metrics: dict[str, dict[str, Any]], manifest: dict[str, Any]) -> str:
             f"{_ci(t5['top3'])} | {_ci(t9['macro_f1'])} | {t9['ece']:.3f} | {_pct(t9['coverage_at_target'])} % | "
             f"{m['latency_cpu']['p50_ms']:.1f} ms | {m['size_mb']:.0f} MB |"
         )
-    for family in PENDING_GPU.values():
+    for key, family in PENDING_GPU.items():
+        if key in metrics:
+            continue
         lines.append(
             f"| {family} | pendiente | pendiente | pendiente | pendiente | pendiente | — | — | — | — |"
         )

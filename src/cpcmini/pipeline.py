@@ -29,6 +29,8 @@ MODEL_FAMILIES = {
     "tfidf_logreg": "1. Base: TF-IDF + regresión logística jerárquica",
     "tfidf_svm": "1. Base: TF-IDF + SVM lineal jerárquico",
     "tfidf_knn": "4. Recuperación: vecinos TF-IDF + voto ponderado",
+    "mmbert_small": "2. Codificador: mmBERT-small jerárquico",
+    "qwen3_lora": "3. Generativo: Qwen3-0.6B-Base + LoRA, salida restringida",
 }
 
 
@@ -94,53 +96,27 @@ def train_and_evaluate(
     artifacts_dir: str | Path,
     reports_dir: str | Path,
 ) -> dict[str, Any]:
-    ev, mcfg = settings.eval, settings.models
+    mcfg = settings.models
     train = read_split(processed_dir, "train")
     val = read_split(processed_dir, "val")
     test = read_split(processed_dir, "test")
     manifest = read_manifest(processed_dir)
     capped = cap_per_class(train, mcfg.linear.max_per_class)
-    train_counts = Counter(train["code9"].to_list())
 
     model = build_model(name, settings)
     start = time.perf_counter()
     model.fit(capped["desc_norm"].to_list(), capped["code9"].to_list())
     train_seconds = time.perf_counter() - start
 
-    val_truth, test_truth = val["code9"].to_list(), test["code9"].to_list()
-    val_raw = model.predict_candidates(val["desc_norm"].to_list(), CANDIDATES_FOR_EVAL)
-    temperature = fit_temperature(val_raw, val_truth)
-    val_cands = calibrate(val_raw, temperature)
-    ranked, conf = level_view(val_cands, 9)
-    threshold = choose_threshold(conf, hits_at_k(ranked, val_truth, 9, 1), ev.target_precision)
-    test_raw = model.predict_candidates(test["desc_norm"].to_list(), CANDIDATES_FOR_EVAL)
-    test_cands = calibrate(test_raw, temperature)
-
-    metrics: dict[str, Any] = {
-        "model": name,
-        "family": MODEL_FAMILIES[name],
-        "dataset_hash": manifest["dataset_hash"],
-        "train_rows": capped.height,
-        "train_seconds": round(train_seconds, 1),
-        "temperature": round(temperature, 4),
-        "validation": evaluate_candidates(
-            val_cands, val_truth, train_counts, ev, threshold.value, mcfg.seed, subsets_of(val)
-        ),
-        "test": evaluate_candidates(
-            test_cands, test_truth, train_counts, ev, threshold.value, mcfg.seed, subsets_of(test)
-        ),
-    }
-    sample = (
-        test["desc_norm"].sample(n=min(ev.latency_samples, test.height), seed=mcfg.seed).to_list()
+    metrics, temperature, threshold = evaluate_model(
+        model, name, settings, processed_dir, train_rows=capped.height, train_seconds=train_seconds
     )
-    metrics["latency_cpu"] = measure_latency(model, sample, mcfg.top_k)
-
     out_dir = Path(artifacts_dir) / name
     meta = registry.ModelMeta(
         name=name,
         family=MODEL_FAMILIES[name],
         temperature=temperature,
-        threshold=threshold.value,
+        threshold=threshold,
         dataset_hash=manifest["dataset_hash"],
         trained_at=datetime.now(UTC).isoformat(timespec="seconds"),
         train_rows=capped.height,
@@ -159,9 +135,56 @@ def train_and_evaluate(
         )
     meta.metrics = {k: metrics[k] for k in ("test", "latency_cpu", "size_mb")}
     registry.write_meta(meta, out_dir)
-    _write_report(metrics, Path(reports_dir))
+    write_report(metrics, reports_dir)
     _log_mlflow(metrics, meta)
     return metrics
+
+
+def evaluate_model(
+    model: CodeClassifier,
+    name: str,
+    settings: Settings,
+    processed_dir: str | Path,
+    train_rows: int,
+    train_seconds: float,
+) -> tuple[dict[str, Any], float, float]:
+    """Protocolo común para cualquier escalón (también los entrenados en Kaggle).
+
+    Calibra la temperatura y el umbral en validación; prueba sólo reporta. Devuelve las métricas,
+    la temperatura y el umbral.
+    """
+    ev, mcfg = settings.eval, settings.models
+    train = read_split(processed_dir, "train")
+    val = read_split(processed_dir, "val")
+    test = read_split(processed_dir, "test")
+    train_counts = Counter(train["code9"].to_list())
+    val_truth, test_truth = val["code9"].to_list(), test["code9"].to_list()
+    val_raw = model.predict_candidates(val["desc_norm"].to_list(), CANDIDATES_FOR_EVAL)
+    temperature = fit_temperature(val_raw, val_truth)
+    val_cands = calibrate(val_raw, temperature)
+    ranked, conf = level_view(val_cands, 9)
+    threshold = choose_threshold(conf, hits_at_k(ranked, val_truth, 9, 1), ev.target_precision)
+    test_raw = model.predict_candidates(test["desc_norm"].to_list(), CANDIDATES_FOR_EVAL)
+    test_cands = calibrate(test_raw, temperature)
+    metrics: dict[str, Any] = {
+        "model": name,
+        "family": MODEL_FAMILIES[name],
+        "dataset_hash": read_manifest(processed_dir)["dataset_hash"],
+        "train_rows": train_rows,
+        "train_seconds": round(train_seconds, 1),
+        "temperature": round(temperature, 4),
+        "validation": evaluate_candidates(
+            val_cands, val_truth, train_counts, ev, threshold.value, mcfg.seed, subsets_of(val)
+        ),
+        "test": evaluate_candidates(
+            test_cands, test_truth, train_counts, ev, threshold.value, mcfg.seed, subsets_of(test)
+        ),
+    }
+    sample = (
+        test["desc_norm"].sample(n=min(ev.latency_samples, test.height), seed=mcfg.seed).to_list()
+    )
+    metrics["latency_cpu"] = measure_latency(model, sample, mcfg.top_k)
+    return metrics, temperature, threshold.value
 
 
 def _quantized_report(
@@ -199,8 +222,8 @@ def _quantized_report(
     return report
 
 
-def _write_report(metrics: dict[str, Any], reports_dir: Path) -> None:
-    out = reports_dir / "metrics"
+def write_report(metrics: dict[str, Any], reports_dir: str | Path) -> None:
+    out = Path(reports_dir) / "metrics"
     out.mkdir(parents=True, exist_ok=True)
     (out / f"{metrics['model']}.json").write_text(
         json.dumps(metrics, ensure_ascii=False, indent=2), encoding="utf-8"

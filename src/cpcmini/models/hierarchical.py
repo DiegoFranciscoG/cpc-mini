@@ -1,14 +1,15 @@
 """Escalón 1: TF-IDF + modelo lineal jerárquico (grupo 3 → subclase 5 → código 9 dígitos).
 
 Cada nodo del árbol de prefijos tiene un clasificador local (regresión logística por SGD o SVM
-lineal con liblinear)
-entrenado sólo con los documentos de su rama y sólo con las columnas que aparecen en ella; así el
-modelo completo cabe en memoria de una laptop. La predicción usa búsqueda en haz (beam) para no
-arrastrar un error temprano: se conservan las ``beam_width`` ramas más probables en cada nivel.
+lineal con liblinear) entrenado sólo con los documentos de su rama y sólo con las columnas que
+aparecen en ella; así el modelo completo cabe en memoria de una laptop. La predicción usa búsqueda en
+haz (beam) para no arrastrar un error temprano: se conservan las ``beam_width`` ramas más probables
+en cada nivel.
 """
 
 from __future__ import annotations
 
+import warnings
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from itertools import pairwise
@@ -16,6 +17,7 @@ from itertools import pairwise
 import numpy as np
 import numpy.typing as npt
 import scipy.sparse as sp
+from sklearn.exceptions import ConvergenceWarning
 from sklearn.linear_model import SGDClassifier
 from sklearn.pipeline import FeatureUnion
 from sklearn.svm import LinearSVC
@@ -107,24 +109,30 @@ class HierarchicalLinear:
         if cols.size == 0:
             cols = np.flatnonzero(df > 0).astype(np.int32)
         sub = x[:, cols]
-        if cfg.loss == "hinge":
-            svm = LinearSVC(C=cfg.C, max_iter=cfg.svm_max_iter, tol=cfg.tol, random_state=self.seed)
-            svm.fit(sub, y)
-            weight, bias, fitted = svm.coef_, svm.intercept_, svm.classes_
-            margin = cfg.svm_softmax_scale
-        else:
-            # Regresión logística entrenada con SGD (OvR): escala a cientos de miles de filas en CPU.
-            lr = SGDClassifier(
-                loss="log_loss",
-                alpha=cfg.alpha,
-                max_iter=cfg.max_iter,
-                tol=cfg.tol,
-                random_state=self.seed,
-                n_jobs=cfg.n_jobs,
-            )
-            lr.fit(sub, y)
-            weight, bias, fitted = lr.coef_, lr.intercept_, lr.classes_
-            margin = 1.0
+        with warnings.catch_warnings():
+            # Con max_iter acotado, muchos nodos pequeños no «convergen» del todo; el efecto real
+            # se mide en validación, no en el aviso.
+            warnings.simplefilter("ignore", ConvergenceWarning)
+            if cfg.loss == "hinge":
+                svm = LinearSVC(
+                    C=cfg.C, max_iter=cfg.svm_max_iter, tol=cfg.tol, random_state=self.seed
+                )
+                svm.fit(sub, y)
+                weight, bias, fitted = svm.coef_, svm.intercept_, svm.classes_
+                margin = cfg.svm_softmax_scale
+            else:
+                # Regresión logística entrenada con SGD (OvR): escala a cientos de miles de filas.
+                lr = SGDClassifier(
+                    loss="log_loss",
+                    alpha=cfg.alpha,
+                    max_iter=cfg.max_iter,
+                    tol=cfg.tol,
+                    random_state=self.seed,
+                    n_jobs=cfg.n_jobs,
+                )
+                lr.fit(sub, y)
+                weight, bias, fitted = lr.coef_, lr.intercept_, lr.classes_
+                margin = 1.0
         weight = np.asarray(weight, dtype=np.float32)
         bias = np.asarray(bias, dtype=np.float32)
         if weight.shape[0] == 1:  # binario: softmax([-z/2, z/2]) == [sigmoid(-z), sigmoid(z)]
