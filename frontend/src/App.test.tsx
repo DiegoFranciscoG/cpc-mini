@@ -61,7 +61,7 @@ describe('Rutas y páginas', () => {
     expect(await screen.findByText('19% a 21%')).toBeInTheDocument();
     expect(screen.getByText('Procesos de un solo ítem')).toBeInTheDocument();
     expect(screen.queryByText('otro')).not.toBeInTheDocument();
-    expect(screen.getByText('4.2 ms')).toBeInTheDocument();
+    expect(screen.getByText('4,2 ms')).toBeInTheDocument();
     expect(screen.getAllByText('sin dato').length).toBeGreaterThan(0);
   });
 

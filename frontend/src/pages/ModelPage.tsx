@@ -1,7 +1,7 @@
 import {Banner} from '@astryxdesign/core/Banner';
 import {Skeleton} from '@astryxdesign/core/Skeleton';
 import type {ModelInfo} from '../api';
-import {formatInteger, formatPercent, usePageMeta} from '../meta';
+import {formatDecimal, formatInteger, formatPercent, usePageMeta} from '../meta';
 import {ROUTES, RouterLink} from '../router';
 import {useModelInfo} from '../useModelInfo';
 
@@ -151,13 +151,13 @@ function ModelSheet({info}: {info: ModelInfo}) {
           {info.latency_ms_p50 !== null ? (
             <div className="figures__row">
               <dt>Latencia típica en CPU</dt>
-              <dd className="num">{info.latency_ms_p50.toFixed(1)} ms</dd>
+              <dd className="num">{formatDecimal(info.latency_ms_p50)} ms</dd>
             </div>
           ) : null}
           {info.size_mb !== null ? (
             <div className="figures__row">
               <dt>Tamaño en disco</dt>
-              <dd className="num">{info.size_mb.toFixed(0)} MB</dd>
+              <dd className="num">{formatInteger(Math.round(info.size_mb))} MB</dd>
             </div>
           ) : null}
           <div className="figures__row">
