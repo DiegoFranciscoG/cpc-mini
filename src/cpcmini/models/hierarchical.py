@@ -39,13 +39,21 @@ class LocalModel:
     bias: npt.NDArray[np.float32] | None = None
     scale: npt.NDArray[np.float32] | None = None
     margin_scale: float = 1.0
+    # Pesos int8 desempaquetados una sola vez en memoria; nunca se guardan en disco.
+    _dense: npt.NDArray[np.float32] | None = field(default=None, repr=False, compare=False)
 
     def dense_weight(self) -> npt.NDArray[np.float32]:
         assert self.weight is not None
         if self.scale is None:
             return self.weight.astype(np.float32, copy=False)
-        out: npt.NDArray[np.float32] = self.weight.astype(np.float32) * self.scale[:, None]
-        return out
+        if self._dense is None:
+            self._dense = self.weight.astype(np.float32) * self.scale[:, None]
+        return self._dense
+
+    def __getstate__(self) -> dict[str, object]:
+        state = dict(self.__dict__)
+        state["_dense"] = None
+        return state
 
     def proba(self, x: sp.csr_matrix) -> npt.NDArray[np.float64]:
         if self.cols is None:
@@ -195,6 +203,12 @@ class HierarchicalLinear:
 
     def nbytes(self) -> int:
         return sum(node.nbytes() for node in self.nodes.values())
+
+    def warmup(self) -> None:
+        """Desempaqueta todos los nodos int8 al cargar (evita pagarlo en la primera consulta)."""
+        for node in self.nodes.values():
+            if node.weight is not None:
+                node.dense_weight()
 
 
 def _keep_top_per_query(

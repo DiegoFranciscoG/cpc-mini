@@ -57,4 +57,7 @@ def load_model(directory: str | Path) -> CodeClassifier:
     if not path.is_file():
         raise FileNotFoundError(f"No existe el artefacto {path}")
     model: CodeClassifier = joblib.load(path)
+    warmup = getattr(model, "warmup", None)
+    if callable(warmup):  # pesos int8: se desempaquetan una vez al cargar
+        warmup()
     return model

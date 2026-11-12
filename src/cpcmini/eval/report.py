@@ -72,8 +72,9 @@ def render(metrics: dict[str, dict[str, Any]], manifest: dict[str, Any]) -> str:
             "",
         ]
     lines += [
-        "Los escalones 2 y 3 necesitan GPU: el código, las pruebas de humo y los cuadernos de Kaggle están "
-        "en el repositorio, pero sus métricas sólo se publican cuando se ejecutan (nada se inventa).",
+        "Los escalones 2 y 3 necesitan GPU: su código, las pruebas unitarias de sus partes puras (trie de "
+        "decodificación restringida, combinación jerárquica) y los cuadernos de Kaggle están en el "
+        "repositorio, pero sus métricas sólo se publican cuando se ejecutan (nada se inventa).",
         "",
         "## Abstención (umbral calibrado en validación para 90 % de exactitud)",
         "",

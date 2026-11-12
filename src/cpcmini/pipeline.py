@@ -208,6 +208,7 @@ def _quantized_report(
     registry.save(q, q_meta, q_dir)
     q_meta.size_bytes = (q_dir / registry.MODEL_FILE).stat().st_size
     sample = test["desc_norm"].sample(n=min(200, test.height), seed=meta.seed).to_list()
+    q.warmup()
     report = {
         "float32_top1_9": round(float_top1, 4),
         "int8_top1_9": round(int8_top1, 4),
@@ -217,7 +218,13 @@ def _quantized_report(
         "int8_file_mb": round(q_meta.size_bytes / 1e6, 2),
         "int8_latency_cpu": measure_latency(q, sample, 3),
     }
-    q_meta.metrics = {"quantization": report}
+    # El int8 hereda las métricas de prueba del float32 (pierde report["drop"]) y mide su latencia.
+    q_meta.metrics = {
+        "test": metrics["test"],
+        "latency_cpu": report["int8_latency_cpu"],
+        "size_mb": report["int8_file_mb"],
+        "quantization": report,
+    }
     registry.write_meta(q_meta, q_dir)
     return report
 

@@ -129,3 +129,18 @@ def test_hierarchy_labels_combine():
 def test_topk_from_scores():
     codes, probs = topk_from_scores(np.array(["a", "b", "c"]), np.array([[0.2, 0.5, 0.3]]), 2)
     assert codes == [["b", "c"]] and probs[0].tolist() == [0.5, 0.3]
+
+
+def test_int8_cache_is_not_persisted(small_linear_cfg, tmp_path):
+    import pickle
+
+    model = HierarchicalLinear(small_linear_cfg, seed=1).fit(TEXTS, CODES)
+    q = quantize_model(model)
+    q.warmup()
+    node = next(n for n in q.nodes.values() if n.weight is not None)
+    assert node._dense is not None
+    restored = pickle.loads(pickle.dumps(q))
+    assert all(n._dense is None for n in restored.nodes.values())
+    assert (
+        restored.predict_candidates(TEXTS[:2], 1).codes == q.predict_candidates(TEXTS[:2], 1).codes
+    )
