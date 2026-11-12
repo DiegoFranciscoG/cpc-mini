@@ -1,0 +1,15 @@
+# Reemplazos para la muestra versionada (sample_data/ocds): CI, imagen Docker de la demo y T-12.
+# Con: CPCMINI_* sin cambios; uso: cpcmini rebuild --override configs/sample.yaml
+data:
+  source:
+    raw_dir: "sample_data/ocds"
+  paths:
+    interim_dir: "build/sample/interim"
+    processed_dir: "build/sample/processed"
+    manifest: "build/sample/processed/manifest.json"
+models:
+  artifacts_dir: "build/sample/artifacts"
+eval:
+  bootstrap_samples: 200
+  bootstrap_samples_f1: 30
+  latency_samples: 50
