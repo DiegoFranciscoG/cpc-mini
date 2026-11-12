@@ -8,10 +8,10 @@
 *.pfx
 
 # ---- Datos y artefactos pesados (se regeneran con `cpcmini rebuild`)
-data/
-artifacts/
-mlruns/
-mlartifacts/
+/data/
+/artifacts/
+/mlruns/
+/mlartifacts/
 *.db
 *.db-journal
 !sample_data/**
@@ -30,8 +30,8 @@ coverage.xml
 htmlcov/
 .ipynb_checkpoints/
 *.egg-info/
-build/
-dist/
+/build/
+/dist/
 
 # ---- Node / frontend
 node_modules/
