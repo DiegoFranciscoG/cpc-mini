@@ -1,0 +1,87 @@
+{
+  "n": 20000,
+  "by_category": {
+    "Sin categoría": {
+      "n": 58.0,
+      "top1_9": 0.2759,
+      "top1_5": 0.7586
+    },
+    "Bienes": {
+      "n": 595.0,
+      "top1_9": 0.0975,
+      "top1_5": 0.1882
+    },
+    "Servicios": {
+      "n": 248.0,
+      "top1_9": 0.2984,
+      "top1_5": 0.4677
+    },
+    "Obras": {
+      "n": 19099.0,
+      "top1_9": 0.1258,
+      "top1_5": 0.1886
+    }
+  },
+  "confusions_5": [
+    {
+      "true": "37510",
+      "pred": "54540",
+      "n": 105,
+      "example": "ARRIOSTRAMIENTO DE HORMIGON SIMPLE"
+    },
+    {
+      "true": "53290",
+      "pred": "37510",
+      "n": 84,
+      "example": "Hormigón simple para columnas f 'c= 210 kg/cm2 (incl. enc. y des)."
+    },
+    {
+      "true": "36320",
+      "pred": "53251",
+      "n": 73,
+      "example": "PUNTO DE INSTALACIONES DE AGUA POTABLE Ø 1/2\" PVC"
+    },
+    {
+      "true": "54540",
+      "pred": "37510",
+      "n": 72,
+      "example": "HORMIGON SIMPLE DE 210 KG/ CM2 EN VIGAS"
+    },
+    {
+      "true": "54740",
+      "pred": "37510",
+      "n": 66,
+      "example": "POZOS REV. f´c=210 kg/cm2 H=0-2m d=1m (cuerpo)"
+    },
+    {
+      "true": "54290",
+      "pred": "54611",
+      "n": 64,
+      "example": "TENDIDO,CALIBRACION Y AMARRE CONDUCTOR CALIBRENo.2/0 TIPO ACSR"
+    },
+    {
+      "true": "51140",
+      "pred": "54330",
+      "n": 58,
+      "example": "EXCAVACIÓN MECÁNICA DE SUELO CONGLOMERADO (0-3)m"
+    },
+    {
+      "true": "54730",
+      "pred": "35110",
+      "n": 57,
+      "example": "PINTURA DE CAUCHO H= 6.01 A 12 M"
+    },
+    {
+      "true": "53290",
+      "pred": "54540",
+      "n": 56,
+      "example": "Bordillo deHormigón Simple de 15x40cm - f´c= 210 kg/cm²; INCLUYE ENCOFRADO"
+    },
+    {
+      "true": "53290",
+      "pred": "36320",
+      "n": 52,
+      "example": "Sum, Tuberia PVC para Alcant, U/E DNE=160 mm (dimin= 135 mm) serie 5, Tipo B (Inc. Sello Elastomérico)"
+    }
+  ]
+}
