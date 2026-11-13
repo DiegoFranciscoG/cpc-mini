@@ -64,6 +64,9 @@ def create_app(api: ApiSettings | None = None, state: AppState | None = None) ->
     async def lifespan(_: FastAPI) -> Any:
         holder["state"] = state or build_state(api)
         yield
+        engine = holder["state"].sessions.kw.get("bind")
+        if engine is not None:
+            engine.dispose()  # cierra las conexiones SQLite al apagar
         holder.clear()
 
     app = FastAPI(
