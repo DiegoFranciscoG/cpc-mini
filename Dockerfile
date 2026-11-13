@@ -4,7 +4,7 @@
 
 FROM ghcr.io/astral-sh/uv:0.13.8 AS uv
 
-FROM python:3.13.18-slim AS build
+FROM python:3.15.0-slim AS build
 COPY --from=uv /uv /usr/local/bin/uv
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy UV_PYTHON_DOWNLOADS=never UV_PROJECT_ENVIRONMENT=/opt/venv
 WORKDIR /app
@@ -21,7 +21,7 @@ RUN mkdir -p data \
  && cpcmini rebuild --override configs/sample.yaml --models tfidf_knn,tfidf_logreg --reports build/sample/reports \
  && cp -r build/sample/artifacts/serving /app/serving
 
-FROM python:3.13.18-slim AS runtime
+FROM python:3.15.0-slim AS runtime
 LABEL org.opencontainers.image.title="cpc-mini-api" \
       org.opencontainers.image.description="API que sugiere códigos CPC para compras públicas de Ecuador" \
       org.opencontainers.image.licenses="MIT"
