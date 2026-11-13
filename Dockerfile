@@ -26,7 +26,13 @@ LABEL org.opencontainers.image.title="cpc-mini-api" \
       org.opencontainers.image.description="API que sugiere códigos CPC para compras públicas de Ecuador" \
       org.opencontainers.image.licenses="MIT"
 ENV PATH="/opt/venv/bin:$PATH" PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
-RUN groupadd --system --gid 10001 app && useradd --system --uid 10001 --gid app --no-create-home app
+# Parches de seguridad del sistema y sin pip (la app usa el entorno de uv; pip trae dependencias vendorizadas).
+RUN apt-get update \
+ && apt-get upgrade -y \
+ && rm -rf /var/lib/apt/lists/* \
+ && python -m pip uninstall -y pip \
+ && groupadd --system --gid 10001 app \
+ && useradd --system --uid 10001 --gid app --no-create-home app
 WORKDIR /app
 COPY --from=build /opt/venv /opt/venv
 COPY --chown=app:app configs ./configs

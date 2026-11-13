@@ -9,6 +9,9 @@ COPY . .
 RUN npm run build
 
 FROM nginxinc/nginx-unprivileged:1.31.7-alpine AS runtime
+# Parches de seguridad de Alpine publicados después de la imagen base.
+USER root
+RUN apk upgrade --no-cache
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /web/dist /usr/share/nginx/html
 # La imagen base ya usa el usuario sin privilegios 101 (nginx); se declara explícitamente.
