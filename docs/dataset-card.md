@@ -24,7 +24,7 @@ deduplicados y divididos por tiempo para medir cómo generaliza un modelo a comp
 Datos del **Servicio Nacional de Contratación Pública (SERCOP)**, publicados en formato OCDS por el
 [OCP Data Registry](https://data.open-contracting.org/en/publication/110) de **Open Contracting
 Partnership** (publicación 110, recuperada el 10 de noviembre de 2026), bajo licencia
-[Creative Commons Reconocimiento 3.0 Ecuador](https://creativecommons.org/licenses/by/3.0/ec/).
+[Creative Commons Reconocimiento 3.0 Ecuador (CC BY 3.0 EC)](https://creativecommons.org/licenses/by/3.0/ec/).
 Este dataset es una obra derivada con la misma licencia; su uso no implica respaldo del SERCOP ni de
 Open Contracting Partnership.
 
