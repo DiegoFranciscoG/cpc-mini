@@ -35,8 +35,12 @@ def download_year(cfg: SourceConfig, year: int, dest_dir: Path, force: bool = Fa
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})  # noqa: S310
     with urllib.request.urlopen(request, timeout=120) as response, tmp.open("wb") as fh:  # noqa: S310
         shutil.copyfileobj(response, fh, length=1 << 20)
-    with gzip.open(tmp, "rt", encoding="utf-8") as check:  # el archivo debe ser gzip+JSON válido
-        json.loads(check.readline())
+    try:
+        with gzip.open(tmp, "rt", encoding="utf-8") as check:  # debe ser gzip con JSON válido
+            json.loads(check.readline())
+    except (OSError, ValueError):
+        tmp.unlink(missing_ok=True)
+        raise
     tmp.replace(target)
     return target
 
