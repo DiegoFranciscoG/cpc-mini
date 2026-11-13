@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # Frontend estático servido por nginx sin privilegios; /api se reenvía al contenedor de la API.
 
-FROM node:24.22.3-alpine AS build
+FROM node:26.13.0-alpine AS build
 WORKDIR /web
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
