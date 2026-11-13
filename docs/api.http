@@ -1,0 +1,38 @@
+### Colección de ejemplos de la API (REST Client de VS Code o JetBrains HTTP Client)
+@base = http://localhost:8080
+
+### Salud
+GET {{base}}/api/v1/health
+
+### Ficha del modelo en servicio (métricas, umbral, atribución)
+GET {{base}}/api/v1/model
+
+### Sugerir códigos para una descripción
+POST {{base}}/api/v1/predictions
+Content-Type: application/json
+
+{"description": "Resma de papel bond A4 de 75 g"}
+
+### Descripción sin información: responde «no sé» sin candidatos
+POST {{base}}/api/v1/predictions
+Content-Type: application/json
+
+{"description": "ver especificaciones en los pliegos"}
+
+### Lote (hasta 50 descripciones)
+POST {{base}}/api/v1/predictions/batch
+Content-Type: application/json
+
+{"descriptions": ["Paracetamol 500 mg tabletas", "Servicio de limpieza de oficinas"]}
+
+### Validación: descripción demasiado corta (422)
+POST {{base}}/api/v1/predictions
+Content-Type: application/json
+
+{"description": "a"}
+
+### Catálogo: un código de 9 dígitos
+GET {{base}}/api/v1/codes/321290418
+
+### Catálogo: búsqueda por texto o prefijo
+GET {{base}}/api/v1/codes?q=papel%20bond&limit=5
