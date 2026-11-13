@@ -132,7 +132,13 @@ def render(metrics: dict[str, dict[str, Any]], manifest: dict[str, Any]) -> str:
 
 
 def write_results(reports_dir: str | Path, manifest: dict[str, Any], extra: str = "") -> Path:
+    """Escribe el informe; conserva el análisis de errores previo si no se pasa uno nuevo."""
     metrics = load_metrics(reports_dir)
+    errors_file = Path(reports_dir) / "errores.md"
+    if extra:
+        errors_file.write_text(extra, encoding="utf-8")
+    elif errors_file.exists():
+        extra = errors_file.read_text(encoding="utf-8")
     out = Path(reports_dir) / "resultados.md"
     out.write_text(render(metrics, manifest) + extra, encoding="utf-8")
     return out

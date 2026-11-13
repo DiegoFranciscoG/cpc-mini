@@ -120,6 +120,40 @@ def report(
 
 
 @app.command()
+def errors(
+    model_dir: Path = Path("artifacts/serving"),
+    config: ConfigOpt = Path("configs"),
+    override: OverrideOpt = None,
+    sample: int = 20000,
+    reports: Path = Path("reports"),
+) -> None:
+    """Análisis de errores del modelo en servicio sobre una muestra fija de prueba."""
+    import polars as pl
+
+    from cpcmini.data.dataset import read_manifest, read_split
+    from cpcmini.eval.errors import branch_labels, error_analysis, render_errors
+    from cpcmini.eval.report import write_results
+    from cpcmini.models.calibration import calibrate
+    from cpcmini.models.registry import load_meta, load_model
+
+    s = _settings(config, override)
+    processed = Path(s.data.paths.processed_dir)
+    test = read_split(processed, "test")
+    frame = test.sample(n=min(sample, test.height), seed=s.models.seed)
+    meta = load_meta(model_dir)
+    cands = calibrate(
+        load_model(model_dir).predict_candidates(frame["desc_norm"].to_list(), 20), meta.temperature
+    )
+    analysis = error_analysis(cands, frame)
+    (reports / "errores.json").write_text(
+        json.dumps(analysis, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    labels = branch_labels(pl.read_parquet(processed / "catalog.parquet"))
+    out = write_results(reports, read_manifest(processed), render_errors(analysis, labels))
+    typer.echo(f"Análisis de errores agregado a {out}")
+
+
+@app.command()
 def package(
     model: str,
     config: ConfigOpt = Path("configs"),
