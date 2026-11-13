@@ -52,6 +52,18 @@ describe('Clasificador', () => {
     expect(await screen.findByText('No sé: la confianza es baja')).toBeInTheDocument();
     expect(screen.getByText('La confianza está por debajo del umbral.')).toBeInTheDocument();
     expect(screen.getByRole('article', {name: 'Candidato más cercano'})).toBeInTheDocument();
+    expect(screen.getByText(/La raya marca el umbral de respuesta \(42%\)/)).toBeInTheDocument();
+  });
+
+  it('explica cuando el umbral es inalcanzable', async () => {
+    mockFetch({
+      '/api/v1/model': () => json(MODEL_INFO),
+      '/api/v1/predictions': () => json(prediction({abstained: true, threshold: 1.01, message: 'No sé: baja.'})),
+    });
+    renderApp(<Classify />);
+    await userEvent.click(screen.getByRole('button', {name: 'Tubería PVC de 110 mm para desagüe'}));
+    expect(await screen.findByText(/ninguna confianza alcanzó 9 aciertos de cada 10/)).toBeInTheDocument();
+    expect(screen.getByRole('meter').querySelector('.meter__threshold')).toBeNull();
   });
 
   it('dice «no sé» si no hay candidatos', async () => {

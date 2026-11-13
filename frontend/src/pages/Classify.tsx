@@ -168,8 +168,9 @@ function Results({state, onRetry}: {state: ResultState; onRetry: () => void}) {
             label={`Confianza del código ${first.code9}`}
           />
           <p className="entry__note">
-            La raya marca el umbral de respuesta ({formatPercent(Math.min(prediction.threshold, 1))}), calibrado para
-            acertar 9 de cada 10 veces en validación.
+            {prediction.threshold <= 1
+              ? `La raya marca el umbral de respuesta (${formatPercent(prediction.threshold)}), calibrado para acertar 9 de cada 10 veces en validación.`
+              : 'En validación ninguna confianza alcanzó 9 aciertos de cada 10, así que este modelo siempre responde «no sé» y muestra candidatos como referencia.'}
           </p>
           <CopyButton code={first.code9} />
         </div>
