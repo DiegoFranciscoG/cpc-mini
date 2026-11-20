@@ -2,7 +2,7 @@
 # API de CPC-mini. Etapa de construcción: dependencias y modelo de demostración (entrenado con la
 # muestra pública versionada). Imagen final sin herramientas de compilación, con usuario sin privilegios.
 
-FROM ghcr.io/astral-sh/uv:0.13.8 AS uv
+FROM ghcr.io/astral-sh/uv:0.13.9 AS uv
 
 FROM python:3.13.18-slim AS build
 COPY --from=uv /uv /usr/local/bin/uv
