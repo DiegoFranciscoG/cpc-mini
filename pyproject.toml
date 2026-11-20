@@ -40,7 +40,7 @@ cpcmini = "cpcmini.cli:app"
 
 [dependency-groups]
 dev = [
-    "httpx2==2.16.0",
+    "httpx2==2.16.2",
     "mypy==2.4.1",
     "pytest==9.2.0",
     "pytest-cov==7.1.0",
